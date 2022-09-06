@@ -22,3 +22,5 @@ RUN apk add supervisor
 RUN mkdir -p /var/log/supervisor
 
 WORKDIR /var/www/html
+
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
