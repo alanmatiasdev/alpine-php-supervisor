@@ -11,7 +11,7 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/install-php-extensions && \
-  install-php-extensions ds pdo_pgsql pgsql sockets intl
+  install-php-extensions ds pdo_pgsql pdo_mysql mysqli amqp pgsql sockets intl bcmath
 
 # ALTERA PORTA DEFAULT DO PHP-FPM
 RUN sed -i 's/9000/9001/' /usr/local/etc/php-fpm.d/zz-docker.conf
