@@ -2,6 +2,7 @@ FROM php:8.2-fpm-alpine
 LABEL maintainer="Alan Matias <falecomigo@alandealmeida.com>"
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV PHP_MEMORY_LIMIT=1024M
 
 RUN apk update
 RUN apk add wget
@@ -13,7 +14,7 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 RUN chmod +x /usr/local/bin/install-php-extensions && \
   install-php-extensions ds pdo_pgsql pdo_mysql mysqli amqp pgsql sockets intl bcmath zip gd pcntl && \
   mv $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini && \
-  sed -i 's/memory_limit = 128M/memory_limit = 512M/' $PHP_INI_DIR/php.ini && \
+  sed -i "s/memory_limit = 128M/memory_limit = ${PHP_MEMORY_LIMIT}/" $PHP_INI_DIR/php.ini && \
   sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 512M/' $PHP_INI_DIR/php.ini && \
   sed -i 's/post_max_size = 8M/post_max_size = 512M/' $PHP_INI_DIR/php.ini
 
