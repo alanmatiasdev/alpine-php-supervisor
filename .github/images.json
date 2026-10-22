@@ -1,4 +1,6 @@
 [
   { "dir": "8.1", "tag": "8.1", "latest": false },
-  { "dir": "8.2", "tag": "8.2", "latest": true }
+  { "dir": "8.2", "tag": "8.2", "latest": true },
+  { "dir": "8.3", "tag": "8.3", "latest": false },
+  { "dir": "8.4", "tag": "8.4", "latest": false }
 ]

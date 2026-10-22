@@ -6,8 +6,10 @@ PHP-FPM on Alpine with [Supervisor](http://supervisord.org), one directory per P
 | --------- | -------------------------------------- | -------------------------------------------------------------------------- |
 | `8.1/`    | `php:8.1-fpm-alpine`                   | Same components as 8.2; gRPC/Protobuf installed with `install-php-extensions`. |
 | `8.2/`    | `alanmatias/php-grpc:8.2-fpm-alpine`   | gRPC/Protobuf from the base image, `php.ini` tuning, Supervisor exporter.  |
+| `8.3/`    | `alanmatias/php-grpc:8.3-fpm-alpine`   | Same as 8.2.                                                               |
+| `8.4/`    | `alanmatias/php-grpc:8.4-fpm-alpine`   | Same as 8.2.                                                               |
 
-Both images run `supervisord` as the entrypoint with `/etc/supervisor/conf.d/supervisord.conf`, which you
+All images run `supervisord` as the entrypoint with `/etc/supervisor/conf.d/supervisord.conf`, which you
 must provide (mount or `COPY` it in a derived image). PHP-FPM listens on port `9001` instead of `9000`.
 
 ## Building
@@ -16,7 +18,7 @@ must provide (mount or `COPY` it in a derived image). PHP-FPM listens on port `9
 docker build -t alpine-php-supervisor:8.2 8.2
 ```
 
-The `8.2` image exposes the Supervisor metrics exporter on port `9876`.
+All images expose the Supervisor metrics exporter on port `9876`.
 
 ## Security
 
