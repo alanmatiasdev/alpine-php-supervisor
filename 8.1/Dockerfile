@@ -1,4 +1,4 @@
-FROM golang:1.22 AS exporter-build
+FROM golang:1.27 AS exporter-build
 
 WORKDIR /src
 RUN git clone --depth 1 https://github.com/salimd/supervisord_exporter.git .
@@ -9,7 +9,7 @@ LABEL maintainer="Alan Matias <me@alanmatias.dev>"
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-COPY --from=composer /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN apk update
 RUN apk add wget

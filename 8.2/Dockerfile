@@ -1,4 +1,4 @@
-FROM golang:1.22 AS exporter-build
+FROM golang:1.27 AS exporter-build
 
 WORKDIR /src
 RUN git clone --depth 1 https://github.com/salimd/supervisord_exporter.git .
