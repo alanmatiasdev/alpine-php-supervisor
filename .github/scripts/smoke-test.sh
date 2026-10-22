@@ -36,8 +36,8 @@ if grep -q 'supervisord_exporter' "$dockerfile"; then
   echo "ok: supervisord_exporter"
 fi
 
-# gRPC comes from the php-grpc base image
-if grep -q 'php-grpc' "$dockerfile"; then
+# gRPC and protobuf are installed in the image or come from the php-grpc base image
+if grep -q 'grpc' "$dockerfile"; then
   for ext in grpc protobuf; do
     run php -r "exit(extension_loaded('$ext') ? 0 : 1);" || { echo "::error::missing PHP extension: $ext ($image)"; exit 1; }
     echo "ok: extension $ext"

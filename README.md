@@ -4,7 +4,7 @@ PHP-FPM on Alpine with [Supervisor](http://supervisord.org), one directory per P
 
 | Directory | Base image                             | Notes                                                                      |
 | --------- | -------------------------------------- | -------------------------------------------------------------------------- |
-| `8.1/`    | `php:8.1-fpm-alpine`                   | Legacy. Composer, common extensions, Supervisor.                           |
+| `8.1/`    | `php:8.1-fpm-alpine`                   | Same components as 8.2; gRPC/Protobuf installed with `install-php-extensions`. |
 | `8.2/`    | `alanmatias/php-grpc:8.2-fpm-alpine`   | gRPC/Protobuf from the base image, `php.ini` tuning, Supervisor exporter.  |
 
 Both images run `supervisord` as the entrypoint with `/etc/supervisor/conf.d/supervisord.conf`, which you
