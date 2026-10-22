@@ -11,7 +11,7 @@ acknowledgement within a few days.
 
 ## Supported images
 
-Only the images published from `main` are supported: PHP 8.1, 8.2, 8.3 and 8.4 (`8.1`, `8.2`, `8.3`, `8.4` and `latest`).
+Only the images published from `main` are supported: PHP 8.1, 8.2, 8.3, 8.4 and 8.5 (`8.1`, `8.2`, `8.3`, `8.4`, `8.5` and `latest`).
 
 ## How the images are protected
 

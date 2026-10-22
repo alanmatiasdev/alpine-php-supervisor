@@ -8,6 +8,7 @@ PHP-FPM on Alpine with [Supervisor](http://supervisord.org), one directory per P
 | `8.2/`    | `alanmatias/php-grpc:8.2-fpm-alpine`   | gRPC/Protobuf from the base image, `php.ini` tuning, Supervisor exporter.  |
 | `8.3/`    | `alanmatias/php-grpc:8.3-fpm-alpine`   | Same as 8.2.                                                               |
 | `8.4/`    | `alanmatias/php-grpc:8.4-fpm-alpine`   | Same as 8.2.                                                               |
+| `8.5/`    | `alanmatias/php-grpc:8.5-fpm-alpine`   | Same as 8.2.                                                               |
 
 All images run `supervisord` as the entrypoint with `/etc/supervisor/conf.d/supervisord.conf`, which you
 must provide (mount or `COPY` it in a derived image). PHP-FPM listens on port `9001` instead of `9000`.
