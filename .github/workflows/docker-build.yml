@@ -1,0 +1,113 @@
+name: Docker Build & Push
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "8.1/**"
+      - "8.2/**"
+      - ".github/images.json"
+      - ".github/workflows/docker-build.yml"
+  pull_request:
+    paths:
+      - "8.1/**"
+      - "8.2/**"
+      - ".github/images.json"
+      - ".github/workflows/docker-build.yml"
+  schedule:
+    # Weekly rebuild of every image to pick up base image patches
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Build matrix
+        id: build-matrix
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+
+          # Scheduled and manual runs rebuild everything; so does a push without a usable previous commit
+          ALL=false
+          case "$EVENT" in
+            schedule|workflow_dispatch) ALL=true ;;
+            pull_request) CHANGED=$(git diff --name-only "origin/${BASE_REF}...HEAD") ;;
+            *)
+              if [[ "$BEFORE" =~ ^0+$ ]] || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+                ALL=true
+              else
+                CHANGED=$(git diff --name-only "$BEFORE" HEAD)
+              fi
+              ;;
+          esac
+
+          # A change to the build tooling itself rebuilds everything
+          if [[ "$ALL" == false ]] && grep -qE '^\.github/' <<< "$CHANGED"; then
+            ALL=true
+          fi
+
+          if [[ "$ALL" == true ]]; then
+            MATRIX=$(jq -c '{include: .}' .github/images.json)
+          else
+            MATRIX=$(jq -c --argjson changed "$(jq -Rsc 'split("\n") | map(select(length > 0))' <<< "$CHANGED")" '
+              {include: [ .[] | select(.dir as $d | any($changed[]; startswith($d + "/"))) ]}
+            ' .github/images.json)
+          fi
+
+          echo "matrix=${MATRIX}" >> "$GITHUB_OUTPUT"
+          jq . <<< "$MATRIX"
+
+  build:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.matrix != '{"include":[]}'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+    env:
+      IMAGE: alandealmeida/alpine-php-supervisor
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ matrix.dir }}
+          file: ${{ matrix.dir }}/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ env.IMAGE }}:${{ matrix.tag }}
+            ${{ matrix.latest && format('{0}:latest', env.IMAGE) || '' }}
+          cache-from: type=gha,scope=${{ matrix.tag }}
+          cache-to: type=gha,scope=${{ matrix.tag }},mode=max
