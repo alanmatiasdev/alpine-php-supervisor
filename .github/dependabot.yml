@@ -1,0 +1,28 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directories:
+      - /8.1
+      - /8.2
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+    ignore:
+      # Each directory tracks one PHP minor line; only patch releases should be proposed
+      - dependency-name: php
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: alanmatias/php-grpc
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: golang
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]

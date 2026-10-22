@@ -1,0 +1,7 @@
+failure-threshold: warning
+ignored:
+  # Package versions come from the pinned base image; pinning them here would break every base update
+  - DL3008
+  - DL3018
+  # Existing Dockerfiles run `apk update` and `apk add` separately; the apk cache is not cleaned there yet
+  - DL3019
