@@ -11,7 +11,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-RUN apk update
+RUN apk update && apk upgrade --no-cache
 RUN apk add wget
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
