@@ -22,10 +22,16 @@ fi
 run supervisord --version
 run php-fpm -t
 
-for ext in pcntl sockets intl bcmath zip gd pdo_pgsql pdo_mysql amqp ds; do
+for ext in pcntl sockets intl bcmath zip gd pdo_pgsql pdo_mysql ds; do
   run php -r "exit(extension_loaded('$ext') ? 0 : 1);" || { echo "::error::missing PHP extension: $ext ($image)"; exit 1; }
   echo "ok: extension $ext"
 done
+
+# amqp is skipped on images whose Dockerfile does not install it (8.6, until upstream supports it)
+if grep -qE 'install-php-extensions.*\bamqp\b' "$dockerfile"; then
+  run php -r "exit(extension_loaded('amqp') ? 0 : 1);" || { echo "::error::missing PHP extension: amqp ($image)"; exit 1; }
+  echo "ok: extension amqp"
+fi
 
 if grep -q 'composer' "$dockerfile"; then
   run composer --version --no-ansi
