@@ -9,7 +9,7 @@ LABEL maintainer="Alan Matias <me@alanmatias.dev>"
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-RUN apk update
+RUN apk update && apk upgrade --no-cache
 RUN apk add wget
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/

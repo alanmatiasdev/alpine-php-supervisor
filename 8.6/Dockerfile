@@ -16,8 +16,9 @@ RUN apk add wget
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
+# ds 1.x do PECL ainda não compila no PHP 8.6 (XtOffsetOf removido); usa o commit do master com o fix
 RUN chmod +x /usr/local/bin/install-php-extensions && \
-  install-php-extensions ds pdo_pgsql pdo_mysql mysqli amqp pgsql sockets intl bcmath zip gd pcntl grpc protobuf && \
+  install-php-extensions php-ds/ext-ds@6e9d66812b0acb9445c446b8dfb79904e0a9bc13 pdo_pgsql pdo_mysql mysqli amqp pgsql sockets intl bcmath zip gd pcntl grpc protobuf && \
   mv $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini && \
   sed -i "s/memory_limit = 128M/memory_limit = 1024M/" $PHP_INI_DIR/php.ini && \
   sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 512M/' $PHP_INI_DIR/php.ini && \
